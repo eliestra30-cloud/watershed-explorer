@@ -46,6 +46,10 @@
       <select id="methodSelect" style="width:100%; padding:6px; font-size:13px; margin-bottom:8px;"></select>
       <label for="scenarioSelect" style="font-weight:bold; display:block; margin-bottom:4px;">Return period / duration:</label>
       <select id="scenarioSelect" style="width:100%; padding:6px; font-size:13px;"></select>
+      <label style="font-size:12px; display:flex; align-items:center; gap:6px; margin-top:8px; cursor:pointer;">
+        <input type="checkbox" id="flowAccumToggle" />
+        Show flow accumulation guide (helps pick good click points)
+      </label>
     </div>
     <div id="status"></div>
     <div id="results"></div>
@@ -174,9 +178,10 @@
       "esri/views/MapView",
       "esri/Graphic",
       "esri/layers/GraphicsLayer",
+      "esri/layers/ImageryTileLayer",
       "esri/geometry/geometryEngine",
       "esri/rest/support/Query"
-    ], function (esriConfig, Map, MapView, Graphic, GraphicsLayer, geometryEngine) {
+    ], function (esriConfig, Map, MapView, Graphic, GraphicsLayer, ImageryTileLayer, geometryEngine) {
 
       // Kick off LERC loading immediately, before any user interaction. This
       // avoids a race condition where the AMD-hiding trick in loadLerc()
@@ -186,8 +191,19 @@
       // to load at the same moment triggered by a click.
       loadLerc().catch(e => console.error("Early Lerc preload failed:", e));
 
+      // Reference layer showing flow accumulation — helps users see where
+      // real drainage paths are, so they click somewhere the watershed
+      // service can actually delineate meaningfully. This is one of Esri's
+      // own public reference layers (org P3ePLMYs2RVChkJx), no token needed.
+      const flowAccumLayer = new ImageryTileLayer({
+        url: "https://tiledimageservices.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/2m30j40d3ct0_Create_Watersheds_Flow_Accumulation_Guide_Map_90m/ImageServer",
+        opacity: 0.6,
+        visible: false
+      });
+
       const map = new Map({ basemap: "topo-vector" });
       const graphicsLayer = new GraphicsLayer();
+      map.add(flowAccumLayer);
       map.add(graphicsLayer);
 
       const view = new MapView({
@@ -204,6 +220,10 @@
         statusEl.className = cls || "";
         statusEl.textContent = msg;
       }
+
+      document.getElementById("flowAccumToggle").addEventListener("change", (e) => {
+        flowAccumLayer.visible = e.target.checked;
+      });
 
       // ============================================================
       // WATERSHED DELINEATION (Phase 2 logic, ported to JS)
