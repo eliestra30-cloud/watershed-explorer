@@ -198,7 +198,17 @@
       const flowAccumLayer = new ImageryTileLayer({
         url: "https://tiledimageservices.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/2m30j40d3ct0_Create_Watersheds_Flow_Accumulation_Guide_Map_90m/ImageServer",
         opacity: 0.6,
-        visible: false
+        visible: false,
+        renderer: {
+          type: "raster-stretch",
+          stretchType: "min-max",
+          colorRamp: {
+            type: "algorithmic",
+            algorithm: "hsv",
+            fromColor: [255, 255, 255, 255], // white = low flow accumulation
+            toColor: [0, 92, 175, 255]        // blue = high flow accumulation (streams/rivers)
+          }
+        }
       });
 
       const map = new Map({ basemap: "topo-vector" });
