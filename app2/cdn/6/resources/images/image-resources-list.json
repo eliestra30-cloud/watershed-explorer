@@ -1,0 +1,166 @@
+{
+  "1785500151716": {
+    "originalName": "Screenshot 2026-07-31 141518.png",
+    "fileName": "1785500151716.png",
+    "size": 1056498,
+    "url": "${appResourceUrl}/images/widget_5/1785500151716.png",
+    "created": 1785500151716,
+    "resourcesPrefix": "images/widget_5",
+    "referredIds": [
+      "1785500225990"
+    ],
+    "originId": "1785500151716",
+    "fileFormat": "image/png",
+    "originalWidth": 957,
+    "originalHeight": 960
+  },
+  "1785500170193": {
+    "file": {},
+    "fileName": "1785500170193.jpeg",
+    "url": "${appResourceUrl}/images/templates/1785500170193.jpeg",
+    "referredIds": [],
+    "fileFormat": "image/jpeg",
+    "originId": "1785500151716",
+    "resourcesPrefix": "images/templates"
+  },
+  "1785500225990": {
+    "file": {},
+    "fileName": "1785500225990.jpeg",
+    "url": "${appResourceUrl}/images/templates/1785500225990.jpeg",
+    "referredIds": [],
+    "fileFormat": "image/jpeg",
+    "originId": "1785500151716",
+    "resourcesPrefix": "images/templates"
+  },
+  "1785500267474": {
+    "originalName": "Screenshot 2026-07-31 141734.png",
+    "fileName": "1785500267474.png",
+    "size": 14316,
+    "url": "${appResourceUrl}/images/widget_8/1785500267474.png",
+    "created": 1785500267474,
+    "resourcesPrefix": "images/widget_8",
+    "referredIds": [],
+    "originId": "1785500267474",
+    "fileFormat": "image/png",
+    "originalWidth": 367,
+    "originalHeight": 307
+  },
+  "1785500397562": {
+    "file": {},
+    "fileName": "1785500397562.jpeg",
+    "url": "${appResourceUrl}/images/templates/1785500397562.jpeg",
+    "referredIds": [],
+    "fileFormat": "image/jpeg",
+    "originId": "1785500267474",
+    "resourcesPrefix": "images/templates"
+  },
+  "1785500478371": {
+    "file": {},
+    "fileName": "1785500478371.jpeg",
+    "url": "${appResourceUrl}/images/templates/1785500478371.jpeg",
+    "referredIds": [],
+    "fileFormat": "image/jpeg",
+    "originId": "1785500267474",
+    "resourcesPrefix": "images/templates"
+  },
+  "1785500510812": {
+    "originalName": "Screenshot 2026-07-31 142139.png",
+    "fileName": "1785500510812.png",
+    "size": 5961,
+    "url": "${appResourceUrl}/images/widget_8/1785500510812.png",
+    "created": 1785500510812,
+    "resourcesPrefix": "images/widget_8",
+    "referredIds": [
+      "1785500524066"
+    ],
+    "originId": "1785500510812",
+    "fileFormat": "image/png",
+    "originalWidth": 186,
+    "originalHeight": 162
+  },
+  "1785500524066": {
+    "file": {},
+    "fileName": "1785500524066.jpeg",
+    "url": "${appResourceUrl}/images/templates/1785500524066.jpeg",
+    "referredIds": [],
+    "fileFormat": "image/jpeg",
+    "originId": "1785500510812",
+    "resourcesPrefix": "images/templates"
+  },
+  "1785501570520": {
+    "originalName": "Screenshot 2026-07-31 143919.png",
+    "fileName": "1785501570520.png",
+    "size": 323247,
+    "url": "${appResourceUrl}/images/widget_24/1785501570520.png",
+    "created": 1785501570520,
+    "resourcesPrefix": "images/widget_24",
+    "referredIds": [
+      "1785501609335"
+    ],
+    "originId": "1785501570520",
+    "fileFormat": "image/png",
+    "originalWidth": 648,
+    "originalHeight": 562
+  },
+  "1785501609335": {
+    "file": {},
+    "fileName": "1785501609335.jpeg",
+    "url": "${appResourceUrl}/images/templates/1785501609335.jpeg",
+    "referredIds": [],
+    "fileFormat": "image/jpeg",
+    "originId": "1785501570520",
+    "resourcesPrefix": "images/templates"
+  },
+  "1785502808431": {
+    "originalName": "Screenshot 2026-07-31 145928.png",
+    "fileName": "1785502808431.png",
+    "size": 14726,
+    "url": "${appResourceUrl}/images/widget_27/1785502808431.png",
+    "created": 1785502808431,
+    "resourcesPrefix": "images/widget_27",
+    "referredIds": [],
+    "originId": "1785502808431",
+    "fileFormat": "image/png",
+    "originalWidth": 349,
+    "originalHeight": 84
+  },
+  "1785502818596": {
+    "originalName": "Screenshot 2026-07-31 145952.png",
+    "fileName": "1785502818596.png",
+    "size": 23539,
+    "url": "${appResourceUrl}/images/widget_27/1785502818596.png",
+    "created": 1785502818596,
+    "resourcesPrefix": "images/widget_27",
+    "referredIds": [],
+    "originId": "1785502818596",
+    "fileFormat": "image/png",
+    "originalWidth": 358,
+    "originalHeight": 186
+  },
+  "1785503131480": {
+    "originalName": "Screenshot 2026-07-31 150520.png",
+    "fileName": "1785503131480.png",
+    "size": 16790,
+    "url": "${appResourceUrl}/images/widget_30/1785503131480.png",
+    "created": 1785503131480,
+    "resourcesPrefix": "images/widget_30",
+    "referredIds": [],
+    "originId": "1785503131480",
+    "fileFormat": "image/png",
+    "originalWidth": 364,
+    "originalHeight": 334
+  },
+  "1785503957061": {
+    "originalName": "Download Free Vectors, Images, Photos & Videos _ Vecteezy.jpg",
+    "fileName": "1785503957061.jpg",
+    "size": 6338,
+    "url": "${appResourceUrl}/images/background_setting/1785503957061.jpg",
+    "created": 1785503957061,
+    "resourcesPrefix": "images/background_setting",
+    "referredIds": [],
+    "originId": "1785503957061",
+    "fileFormat": "image/jpeg",
+    "originalWidth": 736,
+    "originalHeight": 368
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "watershed-widget",
+  "label": "Watershed Explorer",
+  "version": "1.0.0",
+  "type": "widget",
+  "author": "University of Padova",
+  "description": "Interactive watershed delineation and precipitation statistics explorer",
+  "copyright": "",
+  "license": "Apache-2.0",
+  "dependencies": {},
+  "exbVersion": "1.20.0",
+  "translatedLocales": [
+    "en"
+  ],
+  "defaultSize": {
+    "width": 500,
+    "height": 600
+  },
+  "properties": {
+    "hasConfig": false
+  },
+  "outputDataSources": [],
+  "messages": [
+    {
+      "name": "WATERSHED_RESULT",
+      "label": "Watershed Result",
+      "type": "custom",
+      "description": "Published when a watershed analysis is complete"
+    }
+  ],
+  "messageActions": [
+    {
+      "name": "fetchPrecipitation",
+      "label": "Fetch Precipitation",
+      "uri": "actions/fetch-precipitation-action"
+    }
+  ]
+}
