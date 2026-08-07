@@ -84,19 +84,46 @@
       const thisTileOriginX = tileOrigin.x + tileCol * tileSpanDeg;
       const thisTileOriginY = tileOrigin.y - tileRow * tileSpanDeg;
 
-      let sum = 0, count = 0;
+      let sum = 0, count = 0, min = Infinity, max = -Infinity;
       for (let row = 0; row < height; row++) {
         for (let col = 0; col < width; col++) {
           const px = thisTileOriginX + (col + 0.5) * pixelSize;
           const py = thisTileOriginY - (row + 0.5) * pixelSize;
           const idx = row * width + col;
           if ((!mask || mask[idx]) && pointInPolygonAllRings(px, py, watershedRings)) {
-            sum += values[idx];
+            const v = values[idx];
+            sum += v;
             count++;
+            if (v < min) min = v;
+            if (v > max) max = v;
           }
         }
       }
-      return count > 0 ? { mean: sum / count, pixelCount: count } : { mean: null, pixelCount: 0 };
+      if (count === 0) {
+        return { mean: null, pixelCount: 0, min: null, max: null, stdDev: null };
+      }
+      const mean = sum / count;
+
+      // Second pass for standard deviation — needs the mean first, so this
+      // can't be folded into the loop above in one shot without either
+      // storing every sampled value (more memory) or using a running/
+      // Welford-style accumulator. A second pass over the same tile is
+      // simpler and the tile is small enough that this is cheap.
+      let sumSquaredDiff = 0;
+      for (let row = 0; row < height; row++) {
+        for (let col = 0; col < width; col++) {
+          const px = thisTileOriginX + (col + 0.5) * pixelSize;
+          const py = thisTileOriginY - (row + 0.5) * pixelSize;
+          const idx = row * width + col;
+          if ((!mask || mask[idx]) && pointInPolygonAllRings(px, py, watershedRings)) {
+            const diff = values[idx] - mean;
+            sumSquaredDiff += diff * diff;
+          }
+        }
+      }
+      const stdDev = Math.sqrt(sumSquaredDiff / count);
+
+      return { mean, pixelCount: count, min, max, stdDev };
     }
 
     // ============================================================
@@ -104,7 +131,7 @@
     //   parent -> this page:
     //     { type: "computePrecipMean", requestId, serviceUrl, watershedRings, token }
     //   this page -> parent:
-    //     { type: "computePrecipMeanResult", requestId, result: {mean, pixelCount} }
+    //     { type: "computePrecipMeanResult", requestId, result: {mean, pixelCount, min, max, stdDev} }
     //     or
     //     { type: "computePrecipMeanResult", requestId, error: "..." }
     // ============================================================
