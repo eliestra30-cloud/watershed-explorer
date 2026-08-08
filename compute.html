@@ -139,27 +139,53 @@
       }
       dlog('[Compute] points inside polygon (ignoring mask):', pointsInPolygonRegardlessOfMask, '| points that also passed the mask (final count):', count);
       if (count === 0) {
-        dwarn('[Compute] Zero pixel centers landed inside the polygon —', pointsInPolygonRegardlessOfMask > 0 ? 'those that did were masked as nodata.' : 'likely because the watershed is smaller than one pixel at this resolution (' + pixelSize.toFixed(3) + '° ≈ ' + (pixelSize * 111).toFixed(1) + ' km/pixel here). Falling back to the single nearest pixel to the watershed centroid instead of returning nothing.');
-        // Nearest-pixel fallback: find whichever pixel cell actually
-        // contains the watershed's centroid, regardless of whether that
-        // pixel's CENTER point happens to fall inside the (possibly
-        // sub-pixel-sized) polygon. This is the right behavior for small
-        // watersheds against a coarse-resolution dataset — one pixel's
-        // value is still a meaningful estimate, whereas "no data" isn't.
-        const centroidCol = Math.floor((centroidLon - thisTileOriginX) / pixelSize);
-        const centroidRow = Math.floor((thisTileOriginY - centroidLat) / pixelSize);
-        dlog('[Compute] fallback centroidRow/Col within tile:', centroidRow, centroidCol, '(tile is', height, 'x', width, ')');
-        if (centroidRow >= 0 && centroidRow < height && centroidCol >= 0 && centroidCol < width) {
-          const idx = centroidRow * width + centroidCol;
-          if (!mask || mask[idx]) {
-            const v = values[idx];
-            dlog('[Compute] fallback pixel value:', v);
-            return { mean: v, pixelCount: 1, min: v, max: v, stdDev: 0 };
-          } else {
-            dwarn('[Compute] Fallback pixel is also masked as nodata — this location genuinely has no data in this dataset.');
-          }
+        dwarn('[Compute] Zero pixel centers landed inside the polygon —', pointsInPolygonRegardlessOfMask > 0 ? 'those that did were masked as nodata.' : 'likely because the watershed is smaller than one pixel at this resolution (' + pixelSize.toFixed(3) + '° ≈ ' + (pixelSize * 111).toFixed(1) + ' km/pixel here). Falling back to bilinear interpolation among the 4 surrounding pixels instead of returning nothing.');
+
+        // Bilinear interpolation fallback — the standard, defensible way
+        // to extract a point value from a continuous raster (the same
+        // technique ArcGIS's "Extract Values to Points" uses). This does
+        // NOT recover any real sub-pixel detail the source data doesn't
+        // have — it can't, the dataset genuinely only has one value per
+        // ~11km cell here — but it weights the 4 pixels surrounding the
+        // watershed centroid by distance, instead of arbitrarily snapping
+        // to whichever single grid cell the centroid happens to land in.
+        // Pixel centers sit at (col+0.5, row+0.5) in pixel space, hence
+        // the -0.5 offset below when converting to fractional pixel coords.
+        const exactCol = (centroidLon - thisTileOriginX) / pixelSize - 0.5;
+        const exactRow = (thisTileOriginY - centroidLat) / pixelSize - 0.5;
+        const col0 = Math.floor(exactCol), col1 = col0 + 1;
+        const row0 = Math.floor(exactRow), row1 = row0 + 1;
+        const fx = exactCol - col0, fy = exactRow - row0;
+        dlog('[Compute] bilinear: exactRow/Col:', exactRow, exactCol, 'fx/fy:', fx, fy);
+
+        function sampleAt(r, c) {
+          if (r < 0 || r >= height || c < 0 || c >= width) return null;
+          const idx = r * width + c;
+          if (mask && !mask[idx]) return null;
+          return values[idx];
+        }
+
+        const corners = [
+          { v: sampleAt(row0, col0), w: (1 - fx) * (1 - fy) },
+          { v: sampleAt(row0, col1), w: fx * (1 - fy) },
+          { v: sampleAt(row1, col0), w: (1 - fx) * fy },
+          { v: sampleAt(row1, col1), w: fx * fy }
+        ];
+        const validCorners = corners.filter(c => c.v !== null);
+        dlog('[Compute] bilinear corners (null = masked/out-of-bounds):', corners.map(c => c.v));
+
+        if (validCorners.length > 0) {
+          const totalWeight = validCorners.reduce((s, c) => s + c.w, 0);
+          // If every valid corner happens to have zero weight (centroid
+          // sits exactly on a masked corner's opposite), fall back to a
+          // plain average of whatever's valid instead of dividing by zero.
+          const interpolated = totalWeight > 0
+            ? validCorners.reduce((s, c) => s + c.v * c.w, 0) / totalWeight
+            : validCorners.reduce((s, c) => s + c.v, 0) / validCorners.length;
+          dlog('[Compute] bilinear interpolated value:', interpolated, 'using', validCorners.length, 'of 4 corners');
+          return { mean: interpolated, pixelCount: validCorners.length, min: interpolated, max: interpolated, stdDev: 0, estimateType: 'bilinear' };
         } else {
-          dwarn('[Compute] Fallback centroid pixel fell outside the tile bounds entirely.');
+          dwarn('[Compute] All 4 surrounding corners are masked/out-of-bounds — this location genuinely has no data in this dataset.');
         }
         return { mean: null, pixelCount: 0, min: null, max: null, stdDev: null };
       }
