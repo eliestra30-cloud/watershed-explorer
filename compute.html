@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Precipitation Compute (internal — not meant to be viewed directly)</title>
+  <!-- Loaded on purpose with NOTHING else on this page — no ArcGIS SDK, no
+       other framework — so there is nothing for Lerc's UMD wrapper to
+       conflict with, ever. This is the same technique proven reliable in
+       the main watershed_app.html, just given a page entirely to itself. -->
+  <script src="https://unpkg.com/lerc@4.0.4/LercDecode.js"></script>
+</head>
+<body>
+  <p style="font-family:sans-serif; color:#888;">
+    This page is used internally by the Watershed Explorer widget and isn't meant to be opened directly.
+  </p>
+
+  <script>
+    // Which parent pages are allowed to talk to this compute page.
+    // Add/remove as needed — same idea as the Cloudflare Worker's CORS list.
+    const ALLOWED_PARENT_ORIGINS = [
+      "https://eliestra30-cloud.github.io",
+      "https://localhost:3001"
+    ];
+
+    // Debug logging that also relays to the PARENT page's console, so
+    // there's no need to hunt through DevTools' frame selector to see
+    // what's happening inside this iframe — everything shows up together
+    // in the same console as the widget's own [Precip]/[Search] logs.
+    function dlog(...args) {
+      console.log(...args);
+      if (window.parent !== window) {
+        try {
+          window.parent.postMessage({ type: "computeDebugLog", level: "log", args: args.map(a => {
+            try { return JSON.parse(JSON.stringify(a)); } catch (e) { return String(a); }
+          }) }, "*");
+        } catch (e) { /* ignore */ }
+      }
+    }
+    function dwarn(...args) {
+      console.warn(...args);
+      if (window.parent !== window) {
+        try {
+          window.parent.postMessage({ type: "computeDebugLog", level: "warn", args: args.map(a => {
+            try { return JSON.parse(JSON.stringify(a)); } catch (e) { return String(a); }
+          }) }, "*");
+        } catch (e) { /* ignore */ }
+      }
+    }
+
+    let lercReadyPromise = null;
+    function loadLerc() {
+      if (lercReadyPromise) return lercReadyPromise;
+      lercReadyPromise = (async () => {
+        const Lerc = window.LercDecode || window.Lerc;
+        if (!Lerc) throw new Error("LercDecode global not found");
+        await Lerc.load();
+        return Lerc;
+      })();
+      return lercReadyPromise;
+    }
+
+    function pointInPolygonAllRings(x, y, allRings) {
+      let inside = false;
+      for (const ring of allRings) {
+        for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+          const xi = ring[i][0], yi = ring[i][1];
+          const xj = ring[j][0], yj = ring[j][1];
+          const intersect = ((yi > y) !== (yj > y)) &&
+            (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+          if (intersect) inside = !inside;
+        }
+      }
+      return inside;
+    }
+
+    async function computePrecipMean(serviceUrl, watershedRings, token) {
+      const Lerc = await loadLerc();
+
+      const infoResp = await fetch(`${serviceUrl}?f=json&token=${encodeURIComponent(token)}`);
+      const info = await infoResp.json();
+      dlog('[Compute] service info:', info);
+      if (info.error) throw new Error("Service info error: " + JSON.stringify(info.error));
+      const tileOrigin = info.tileInfo.origin;
+      const pixelSize = info.tileInfo.lods[0].resolution;
+      const tileSpanDeg = pixelSize * info.tileInfo.cols;
+      dlog('[Compute] tileOrigin:', tileOrigin, 'pixelSize:', pixelSize, 'tileSpanDeg:', tileSpanDeg);
+
+      const mainRing = watershedRings.reduce((a, b) => (b.length > a.length ? b : a));
+      let sumLon = 0, sumLat = 0;
+      for (const [lon, lat] of mainRing) { sumLon += lon; sumLat += lat; }
+      const centroidLon = sumLon / mainRing.length;
+      const centroidLat = sumLat / mainRing.length;
+      dlog('[Compute] centroid:', centroidLon, centroidLat);
+
+      const tileCol = Math.floor((centroidLon - tileOrigin.x) / tileSpanDeg);
+      const tileRow = Math.floor((tileOrigin.y - centroidLat) / tileSpanDeg);
+      dlog('[Compute] tileRow:', tileRow, 'tileCol:', tileCol);
+
+      const tileResp = await fetch(`${serviceUrl}/tile/0/${tileRow}/${tileCol}?token=${encodeURIComponent(token)}`);
+      dlog('[Compute] tile fetch status:', tileResp.status, tileResp.ok);
+      if (!tileResp.ok) throw new Error(`Tile fetch failed: HTTP ${tileResp.status}`);
+      const tileBuffer = await tileResp.arrayBuffer();
+      dlog('[Compute] tile buffer byte length:', tileBuffer.byteLength);
+
+      const decoded = Lerc.decode(tileBuffer);
+      const width = decoded.width;
+      const height = decoded.height;
+      dlog('[Compute] decoded tile width x height:', width, 'x', height);
+      const expectedLen = width * height;
+      let values = decoded.pixels;
+      if (values && values.length !== expectedLen && values[0] && values[0].length === expectedLen) {
+        values = values[0];
+      }
+      const mask = decoded.mask;
+      dlog('[Compute] mask present:', !!mask, mask ? 'mask true-count: ' + mask.reduce((a,b)=>a+(b?1:0),0) : '');
+
+      const thisTileOriginX = tileOrigin.x + tileCol * tileSpanDeg;
+      const thisTileOriginY = tileOrigin.y - tileRow * tileSpanDeg;
+      dlog('[Compute] thisTileOrigin:', thisTileOriginX, thisTileOriginY);
+
+      let sum = 0, count = 0, min = Infinity, max = -Infinity;
+      let pointsInPolygonRegardlessOfMask = 0;
+      for (let row = 0; row < height; row++) {
+        for (let col = 0; col < width; col++) {
+          const px = thisTileOriginX + (col + 0.5) * pixelSize;
+          const py = thisTileOriginY - (row + 0.5) * pixelSize;
+          const idx = row * width + col;
+          const inPoly = pointInPolygonAllRings(px, py, watershedRings);
+          if (inPoly) pointsInPolygonRegardlessOfMask++;
+          if ((!mask || mask[idx]) && inPoly) {
+            const v = values[idx];
+            sum += v;
+            count++;
+            if (v < min) min = v;
+            if (v > max) max = v;
+          }
+        }
+      }
+      dlog('[Compute] points inside polygon (ignoring mask):', pointsInPolygonRegardlessOfMask, '| points that also passed the mask (final count):', count);
+      if (count === 0) {
+        dwarn('[Compute] Zero pixel centers landed inside the polygon —', pointsInPolygonRegardlessOfMask > 0 ? 'those that did were masked as nodata.' : 'likely because the watershed is smaller than one pixel at this resolution (' + pixelSize.toFixed(3) + '° ≈ ' + (pixelSize * 111).toFixed(1) + ' km/pixel here). Falling back to the single nearest pixel to the watershed centroid instead of returning nothing.');
+        // Nearest-pixel fallback: find whichever pixel cell actually
+        // contains the watershed's centroid, regardless of whether that
+        // pixel's CENTER point happens to fall inside the (possibly
+        // sub-pixel-sized) polygon. This is the right behavior for small
+        // watersheds against a coarse-resolution dataset — one pixel's
+        // value is still a meaningful estimate, whereas "no data" isn't.
+        const centroidCol = Math.floor((centroidLon - thisTileOriginX) / pixelSize);
+        const centroidRow = Math.floor((thisTileOriginY - centroidLat) / pixelSize);
+        dlog('[Compute] fallback centroidRow/Col within tile:', centroidRow, centroidCol, '(tile is', height, 'x', width, ')');
+        if (centroidRow >= 0 && centroidRow < height && centroidCol >= 0 && centroidCol < width) {
+          const idx = centroidRow * width + centroidCol;
+          if (!mask || mask[idx]) {
+            const v = values[idx];
+            dlog('[Compute] fallback pixel value:', v);
+            return { mean: v, pixelCount: 1, min: v, max: v, stdDev: 0 };
+          } else {
+            dwarn('[Compute] Fallback pixel is also masked as nodata — this location genuinely has no data in this dataset.');
+          }
+        } else {
+          dwarn('[Compute] Fallback centroid pixel fell outside the tile bounds entirely.');
+        }
+        return { mean: null, pixelCount: 0, min: null, max: null, stdDev: null };
+      }
+      const mean = sum / count;
+
+      // Second pass for standard deviation — needs the mean first, so this
+      // can't be folded into the loop above in one shot without either
+      // storing every sampled value (more memory) or using a running/
+      // Welford-style accumulator. A second pass over the same tile is
+      // simpler and the tile is small enough that this is cheap.
+      let sumSquaredDiff = 0;
+      for (let row = 0; row < height; row++) {
+        for (let col = 0; col < width; col++) {
+          const px = thisTileOriginX + (col + 0.5) * pixelSize;
+          const py = thisTileOriginY - (row + 0.5) * pixelSize;
+          const idx = row * width + col;
+          if ((!mask || mask[idx]) && pointInPolygonAllRings(px, py, watershedRings)) {
+            const diff = values[idx] - mean;
+            sumSquaredDiff += diff * diff;
+          }
+        }
+      }
+      const stdDev = Math.sqrt(sumSquaredDiff / count);
+
+      return { mean, pixelCount: count, min, max, stdDev };
+    }
+
+    // ============================================================
+    // Message protocol with the parent (the ExB custom widget):
+    //   parent -> this page:
+    //     { type: "computePrecipMean", requestId, serviceUrl, watershedRings, token }
+    //   this page -> parent:
+    //     { type: "computePrecipMeanResult", requestId, result: {mean, pixelCount, min, max, stdDev} }
+    //     or
+    //     { type: "computePrecipMeanResult", requestId, error: "..." }
+    // ============================================================
+    window.addEventListener("message", async (event) => {
+      if (!ALLOWED_PARENT_ORIGINS.includes(event.origin)) {
+        console.warn("Ignored message from unexpected origin:", event.origin);
+        return;
+      }
+      const data = event.data;
+      if (!data || data.type !== "computePrecipMean") return;
+
+      try {
+        const result = await computePrecipMean(data.serviceUrl, data.watershedRings, data.token);
+        event.source.postMessage({
+          type: "computePrecipMeanResult",
+          requestId: data.requestId,
+          result
+        }, event.origin);
+      } catch (err) {
+        event.source.postMessage({
+          type: "computePrecipMeanResult",
+          requestId: data.requestId,
+          error: err.message || String(err)
+        }, event.origin);
+      }
+    });
+
+    // Let the parent know this page is ready to receive requests.
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: "computePrecipMeanReady" }, "*");
+    }
+  </script>
+</body>
+</html>
