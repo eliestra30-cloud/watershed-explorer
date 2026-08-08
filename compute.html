@@ -22,6 +22,31 @@
       "https://localhost:3001"
     ];
 
+    // Debug logging that also relays to the PARENT page's console, so
+    // there's no need to hunt through DevTools' frame selector to see
+    // what's happening inside this iframe — everything shows up together
+    // in the same console as the widget's own [Precip]/[Search] logs.
+    function dlog(...args) {
+      console.log(...args);
+      if (window.parent !== window) {
+        try {
+          window.parent.postMessage({ type: "computeDebugLog", level: "log", args: args.map(a => {
+            try { return JSON.parse(JSON.stringify(a)); } catch (e) { return String(a); }
+          }) }, "*");
+        } catch (e) { /* ignore */ }
+      }
+    }
+    function dwarn(...args) {
+      console.warn(...args);
+      if (window.parent !== window) {
+        try {
+          window.parent.postMessage({ type: "computeDebugLog", level: "warn", args: args.map(a => {
+            try { return JSON.parse(JSON.stringify(a)); } catch (e) { return String(a); }
+          }) }, "*");
+        } catch (e) { /* ignore */ }
+      }
+    }
+
     let lercReadyPromise = null;
     function loadLerc() {
       if (lercReadyPromise) return lercReadyPromise;
@@ -53,45 +78,45 @@
 
       const infoResp = await fetch(`${serviceUrl}?f=json&token=${encodeURIComponent(token)}`);
       const info = await infoResp.json();
-      console.log('[Compute] service info:', info);
+      dlog('[Compute] service info:', info);
       if (info.error) throw new Error("Service info error: " + JSON.stringify(info.error));
       const tileOrigin = info.tileInfo.origin;
       const pixelSize = info.tileInfo.lods[0].resolution;
       const tileSpanDeg = pixelSize * info.tileInfo.cols;
-      console.log('[Compute] tileOrigin:', tileOrigin, 'pixelSize:', pixelSize, 'tileSpanDeg:', tileSpanDeg);
+      dlog('[Compute] tileOrigin:', tileOrigin, 'pixelSize:', pixelSize, 'tileSpanDeg:', tileSpanDeg);
 
       const mainRing = watershedRings.reduce((a, b) => (b.length > a.length ? b : a));
       let sumLon = 0, sumLat = 0;
       for (const [lon, lat] of mainRing) { sumLon += lon; sumLat += lat; }
       const centroidLon = sumLon / mainRing.length;
       const centroidLat = sumLat / mainRing.length;
-      console.log('[Compute] centroid:', centroidLon, centroidLat);
+      dlog('[Compute] centroid:', centroidLon, centroidLat);
 
       const tileCol = Math.floor((centroidLon - tileOrigin.x) / tileSpanDeg);
       const tileRow = Math.floor((tileOrigin.y - centroidLat) / tileSpanDeg);
-      console.log('[Compute] tileRow:', tileRow, 'tileCol:', tileCol);
+      dlog('[Compute] tileRow:', tileRow, 'tileCol:', tileCol);
 
       const tileResp = await fetch(`${serviceUrl}/tile/0/${tileRow}/${tileCol}?token=${encodeURIComponent(token)}`);
-      console.log('[Compute] tile fetch status:', tileResp.status, tileResp.ok);
+      dlog('[Compute] tile fetch status:', tileResp.status, tileResp.ok);
       if (!tileResp.ok) throw new Error(`Tile fetch failed: HTTP ${tileResp.status}`);
       const tileBuffer = await tileResp.arrayBuffer();
-      console.log('[Compute] tile buffer byte length:', tileBuffer.byteLength);
+      dlog('[Compute] tile buffer byte length:', tileBuffer.byteLength);
 
       const decoded = Lerc.decode(tileBuffer);
       const width = decoded.width;
       const height = decoded.height;
-      console.log('[Compute] decoded tile width x height:', width, 'x', height, 'statistics:', decoded.statistics);
+      dlog('[Compute] decoded tile width x height:', width, 'x', height);
       const expectedLen = width * height;
       let values = decoded.pixels;
       if (values && values.length !== expectedLen && values[0] && values[0].length === expectedLen) {
         values = values[0];
       }
       const mask = decoded.mask;
-      console.log('[Compute] mask present:', !!mask, mask ? 'mask true-count: ' + mask.reduce((a,b)=>a+(b?1:0),0) : '');
+      dlog('[Compute] mask present:', !!mask, mask ? 'mask true-count: ' + mask.reduce((a,b)=>a+(b?1:0),0) : '');
 
       const thisTileOriginX = tileOrigin.x + tileCol * tileSpanDeg;
       const thisTileOriginY = tileOrigin.y - tileRow * tileSpanDeg;
-      console.log('[Compute] thisTileOrigin:', thisTileOriginX, thisTileOriginY);
+      dlog('[Compute] thisTileOrigin:', thisTileOriginX, thisTileOriginY);
 
       let sum = 0, count = 0, min = Infinity, max = -Infinity;
       let pointsInPolygonRegardlessOfMask = 0;
@@ -111,9 +136,9 @@
           }
         }
       }
-      console.log('[Compute] points inside polygon (ignoring mask):', pointsInPolygonRegardlessOfMask, '| points that also passed the mask (final count):', count);
+      dlog('[Compute] points inside polygon (ignoring mask):', pointsInPolygonRegardlessOfMask, '| points that also passed the mask (final count):', count);
       if (count === 0) {
-        console.warn('[Compute] Returning zero — polygon-only hits:', pointsInPolygonRegardlessOfMask, pointsInPolygonRegardlessOfMask > 0 ? '(so the tile/polygon math IS correct — every candidate pixel was masked out as nodata)' : '(so NO pixel centers fell inside the polygon at all — likely a tile-selection or coordinate mismatch)');
+        dwarn('[Compute] Returning zero — polygon-only hits:', pointsInPolygonRegardlessOfMask, pointsInPolygonRegardlessOfMask > 0 ? '(so the tile/polygon math IS correct — every candidate pixel was masked out as nodata)' : '(so NO pixel centers fell inside the polygon at all — likely a tile-selection or coordinate mismatch)');
         return { mean: null, pixelCount: 0, min: null, max: null, stdDev: null };
       }
       const mean = sum / count;
