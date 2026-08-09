@@ -166,8 +166,8 @@
           "setting": {
             "style": {},
             "autoProps": {
-              "left": false,
-              "right": true,
+              "left": true,
+              "right": false,
               "bottom": false,
               "top": true,
               "width": "CUSTOM"
@@ -179,12 +179,12 @@
             "lockLayout": false
           },
           "bbox": {
-            "left": "48.00%",
-            "top": "29.4%",
+            "left": "48.0%",
+            "top": "29.3%",
             "width": "46.0%",
-            "height": "63.2%",
+            "height": "67.1%",
             "right": "6.0%",
-            "bottom": "7.50%"
+            "bottom": "3.6%"
           },
           "widgetId": "widget_7",
           "isPending": false
@@ -232,6 +232,28 @@
               "bottom": true
             }
           }
+        },
+        "5": {
+          "type": "WIDGET",
+          "widgetId": "widget_43",
+          "bbox": {
+            "left": "67.0%",
+            "right": "0.1%",
+            "top": "93.2%",
+            "bottom": "0.1%",
+            "width": "32.9%",
+            "height": "6.7%"
+          },
+          "setting": {
+            "autoProps": {
+              "right": false,
+              "left": true,
+              "top": true,
+              "bottom": false
+            },
+            "vCenter": false,
+            "hCenter": false
+          }
         }
       },
       "order": [
@@ -239,7 +261,8 @@
         "1",
         "2",
         "3",
-        "4"
+        "4",
+        "5"
       ],
       "setting": {
         "lockDescendants": true
@@ -393,9 +416,9 @@
             "left": "49.9%",
             "right": "3.8%",
             "top": "40.9%",
-            "bottom": "17.7%",
+            "bottom": "14.0%",
             "width": "46.3%",
-            "height": "41.4%"
+            "height": "45.1%"
           },
           "setting": {
             "autoProps": {
@@ -621,16 +644,16 @@
             "left": "1.1%",
             "right": "51.1%",
             "top": "4.4%",
-            "bottom": "7.3%",
+            "bottom": "2.9%",
             "width": "47.8%",
-            "height": "88.3%"
+            "height": "92.7%"
           },
           "setting": {
             "autoProps": {
               "left": false,
               "right": true,
-              "top": false,
-              "bottom": true
+              "top": true,
+              "bottom": false
             }
           }
         },
@@ -638,12 +661,12 @@
           "type": "WIDGET",
           "widgetId": "widget_31",
           "bbox": {
-            "left": "52.3%",
-            "right": "6.7%",
-            "top": "52.2%",
-            "bottom": "4.9%",
+            "left": "52.4%",
+            "right": "6.6%",
+            "top": "41.6%",
+            "bottom": "3.0%",
             "width": "41.0%",
-            "height": "42.9%"
+            "height": "55.4%"
           },
           "setting": {
             "autoProps": {
@@ -1053,6 +1076,7 @@
       "label": "Text 2",
       "config": {
         "text": "<p style=\"text-align: left;\"><strong style=\"font-size: 14px;\">General Information</strong></p>",
+        "placeholder": "<p style=\"text-align: left;\"><strong style=\"font-size: 14px;\">Title</strong></p>",
         "style": {
           "verticalAlign": "start",
           "wrap": true
@@ -1065,7 +1089,8 @@
       "version": "1.21.0",
       "label": "Text 3",
       "config": {
-        "text": "<p>Select a method and a return period. </p><p><br></p><p>Click on a point on the main map (the use of the <em>flow accumulation guide</em> is advised).</p><p><br></p><p>After the delineation of the watershed, please click the \"<em>Fetch Precipitation</em>\" button. </p><p><br></p><p>A summary of data and a statistical value for the precipitation will appear.</p>",
+        "text": "<p>Select a method, duration and return period.</p><p><br></p><p>Click on a point on the main map (the use of the <em>flow accumulation guide, river net lines and drainage network </em>is advised - see Layers.)</p><p><br></p><p>After the delineation of the watershed, please click the \"<em>Fetch Precipitation</em>\" button.</p><p><br></p><p>A summary of statistical values and results for the precipitation will appear.                 </p>",
+        "placeholder": "<p><span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </span></p>",
         "style": {
           "verticalAlign": "start",
           "wrap": true
@@ -1142,6 +1167,7 @@
       "label": "Text 4",
       "config": {
         "text": "<p style=\"text-align: left;\"><strong style=\"font-size: 14px; color: var(--ref-palette-neutral-1300);\">Welcome to the </strong><em style=\"font-size: 14px; color: var(--sys-color-primary-main);\">Watershed Explorer</em></p>",
+        "placeholder": "<p style=\"text-align: left;\"><strong style=\"font-size: 14px;\">Title</strong></p>",
         "style": {
           "verticalAlign": "start",
           "wrap": true,
@@ -1156,6 +1182,7 @@
       "label": "Text 5",
       "config": {
         "text": "<p><strong style=\"font-size: 16px;\">Selection</strong></p>",
+        "placeholder": "<p><strong style=\"font-size: 16px;\">Title</strong></p>",
         "style": {
           "verticalAlign": "start",
           "wrap": true
@@ -1168,7 +1195,8 @@
       "version": "1.21.0",
       "label": "Text 6",
       "config": {
-        "text": "<p>Select a statistical method and a return period (+ time period) from the dropdown box located in the left panel.</p>",
+        "text": "<p>Select the duration, statistical method, and a return period from the dropdown boxes located in the left panel.</p>",
+        "placeholder": "<p><span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span></p>",
         "style": {
           "verticalAlign": "start",
           "wrap": true
@@ -1181,7 +1209,8 @@
       "version": "1.21.0",
       "label": "Text 8",
       "config": {
-        "text": "<p>After the delineation of the watershed, please click the \"<em>Fetch</em> <em>Precipitation</em>\" button.</p><p>It <span style=\"color: var(--sys-color-info-main);\">calculates</span> the <span style=\"color: var(--sys-color-primary-main);\">mean precipitation</span> of the delineated watershed, based on the selected method and time/period scenario.</p><p><br></p><p>Keep in mind, the button will only work after the watershed has been delineated.</p>",
+        "text": "<p>After the delineation of the watershed, please click the \"<em>Fetch</em> <em>Precipitation</em>\" button.</p><p><br></p><p>It <span style=\"color: var(--sys-color-info-main);\">calculates</span> the <span style=\"color: var(--sys-color-primary-main);\">mean precipitation, standard deviation, min and max</span> of the delineated watershed, based on the selected method and duration / return period.</p><p><br></p><p>Keep in mind the button will only work after the watershed has been delineated.</p>",
+        "placeholder": "<p><span>Cu ullum sententiae interpretaris eum, modus impetus ei cum, sit et veri possit volumus. Solum nulla oportere nam at. Ea causae maiorum pro, te mel dicam nominavi intellegat.  </span></p>",
         "style": {
           "verticalAlign": "start",
           "wrap": true
@@ -1195,6 +1224,7 @@
       "label": "Text 9",
       "config": {
         "text": "<p><strong style=\"font-size: 16px;\">Results</strong></p>",
+        "placeholder": "<p><strong style=\"font-size: 16px;\">Title</strong></p>",
         "style": {
           "verticalAlign": "start",
           "wrap": true
@@ -1207,7 +1237,8 @@
       "version": "1.21.0",
       "label": "Text 10",
       "config": {
-        "text": "<p> A summary of data and a statistical  mean valu for the precipitation will appear, together with the rest of the data.</p>",
+        "text": "<p>A summary of statistical values for the precipitation will appear, along with the rest of the results.</p>",
+        "placeholder": "<p><span>Eam laudem partem delectus ne, ipsum assentior id eam. Modus tamquam eam cu, nisl autem modus pri et.  </span></p>",
         "style": {
           "verticalAlign": "start",
           "wrap": true
@@ -1361,26 +1392,26 @@
           "linkParam": {},
           "scale": "Fit",
           "imageParam": {
-            "url": "${appResourceUrl}/images/templates/1785501609335.jpeg",
-            "originalUrl": "${appResourceUrl}/images/widget_24/1785501570520.png",
-            "fileName": "1785501570520.png",
-            "originalName": "Screenshot 2026-07-31 143919.png",
+            "url": "${appResourceUrl}/images/templates/1786236333454.jpeg",
+            "originalUrl": "${appResourceUrl}/images/widget_24/1786236039678.png",
+            "fileName": "1786236039678.png",
+            "originalName": "Screenshot 2026-08-09 024030.png",
             "imgSourceType": "BY_UPLOAD",
             "fileFormat": "image/jpeg",
-            "originalId": "1785501570520",
-            "originalWidth": 648,
-            "originalHeight": 562,
+            "originalId": "1786236039678",
+            "originalWidth": 810,
+            "originalHeight": 355,
             "cropParam": {
               "cropPosition": {
-                "x": 71.90861348898241,
-                "y": 51.721984258690384
+                "x": 148.76719107100382,
+                "y": -1.4210854715202004e-14
               },
-              "cropZoom": 0.5363771681803928,
+              "cropZoom": 0.7085094183263644,
               "cropPixel": {
-                "x": 4.24818254798214,
-                "y": 0,
-                "width": 371.37658642087473,
-                "height": 369.14322932815287
+                "x": 15.234379838931234,
+                "y": 2.0057397047410853e-14,
+                "width": 359.58709498552207,
+                "height": 355
               },
               "cropType": "REAL"
             }
@@ -1415,7 +1446,8 @@
       "version": "1.21.0",
       "label": "Text 11",
       "config": {
-        "text": "<p><span style=\"font-size: 13px;\">Additionaly, the use of the </span><strong style=\"font-size: 13px;\"><em>flow accumulation guide</em></strong><em style=\"font-size: 13px;\"> </em><span style=\"font-size: 13px;\">layer, is advised, and can be used to </span><span style=\"font-size: 13px; color: var(--sys-color-primary-main);\">highlight </span><span style=\"font-size: 13px; color: var(--ref-palette-neutral-1300);\">the </span><span style=\"font-size: 13px; color: var(--sys-color-primary-main);\">drainage paths</span><span style=\"font-size: 13px;\"> to help you pick a more </span><span style=\"font-size: 13px; color: rgb(32, 92, 165);\">accurate watershed outlet point</span><span style=\"font-size: 13px;\">.</span></p>",
+        "text": "<p><span style=\"font-size: 13px;\">Additionally, using the </span><strong style=\"font-size: 13px;\"><em>flow accumulation guide, river net lines, and the drainage network</em></strong><em style=\"font-size: 13px;\"> </em><span style=\"font-size: 13px;\">layer is advised, and can be used to </span><span style=\"font-size: 13px; color: var(--sys-color-primary-main);\">highlight </span><span style=\"font-size: 13px; color: var(--ref-palette-neutral-1300);\">the </span><span style=\"font-size: 13px; color: var(--sys-color-primary-main);\">drainage paths</span><span style=\"font-size: 13px;\"> to help you pick a more </span><span style=\"font-size: 13px; color: rgb(32, 92, 165);\">accurate watershed outlet point</span><span style=\"font-size: 13px;\">.</span></p>",
+        "placeholder": "<p><span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span></p>",
         "style": {
           "verticalAlign": "start",
           "wrap": true
@@ -1438,6 +1470,7 @@
       "label": "Text 12",
       "config": {
         "text": "<p><strong style=\"font-size: 16px;\">Precipitation data</strong></p>",
+        "placeholder": "<p><strong style=\"font-size: 16px;\">Title</strong></p>",
         "style": {
           "verticalAlign": "start",
           "wrap": true
@@ -1557,19 +1590,34 @@
           "linkParam": {},
           "scale": "Fit",
           "imageParam": {
-            "url": "${appResourceUrl}/images/widget_27/1785502808431.png",
+            "url": "${appResourceUrl}/images/templates/1786236706817.jpeg",
             "originalUrl": "${appResourceUrl}/images/widget_27/1785502808431.png",
             "fileName": "1785502808431.png",
             "originalName": "Screenshot 2026-07-31 145928.png",
             "imgSourceType": "BY_UPLOAD",
-            "fileFormat": "image/png",
+            "fileFormat": "image/jpeg",
             "originalId": "1785502808431",
             "originalWidth": 349,
-            "originalHeight": 84
+            "originalHeight": 84,
+            "cropParam": {
+              "cropPosition": {
+                "x": 0,
+                "y": -2
+              },
+              "cropZoom": 0.7490150429799427,
+              "cropPixel": {
+                "x": 0,
+                "y": 5.855308125023348,
+                "width": 348.99999999999994,
+                "height": 77.62973043255938
+              },
+              "cropType": "REAL"
+            }
           },
           "imageDisplayQualityMode": "ORIGINAL",
           "imgSourceType": "",
-          "srcExpression": null
+          "srcExpression": null,
+          "isCropped": true
         },
         "styleConfig": {}
       },
@@ -1593,16 +1641,29 @@
           "linkParam": {},
           "scale": "Fit",
           "imageParam": {
-            "url": "${appResourceUrl}/images/widget_30/1785503131480.png",
-            "originalUrl": "${appResourceUrl}/images/widget_30/1785503131480.png",
-            "fileName": "1785503131480.png",
-            "originalName": "Screenshot 2026-07-31 150520.png",
+            "url": "${appResourceUrl}/images/templates/1786237200530.jpeg",
+            "originalUrl": "${appResourceUrl}/images/widget_30/1786237175623.png",
+            "fileName": "1786237175623.png",
+            "originalName": "Screenshot 2026-08-09 025923.png",
             "imgSourceType": "BY_UPLOAD",
-            "fileFormat": "image/png",
-            "originalId": "1785503131480",
-            "originalWidth": 364,
-            "originalHeight": 334,
-            "cropParam": {}
+            "fileFormat": "image/jpeg",
+            "originalId": "1786237175623",
+            "originalWidth": 807,
+            "originalHeight": 505,
+            "cropParam": {
+              "cropPosition": {
+                "x": 149.7848303567231,
+                "y": -31.979483297557234
+              },
+              "cropZoom": 0.6985580517040457,
+              "cropPixel": {
+                "x": 0,
+                "y": 118.83224221294638,
+                "width": 378.159963037169,
+                "height": 358.89407171571133
+              },
+              "cropType": "REAL"
+            }
           },
           "imageDisplayQualityMode": "ORIGINAL",
           "imgSourceType": "",
@@ -1634,7 +1695,8 @@
       "version": "1.21.0",
       "label": "Text 13",
       "config": {
-        "text": "<p><span style=\"font-size: 13px;\">Please note, that in order to calculate a mean value for a different statistical method or return/time period it is not necessary to delineate a new watershed of the same location.</span></p>",
+        "text": "<p><strong style=\"font-size: 13px;\">Please note</strong><span style=\"font-size: 13px;\"> that in order to calculate the different statistical values for a different method or duration / return period </span><strong style=\"font-size: 13px;\">it is not </strong><span style=\"font-size: 13px;\">necessary to delineate a</span><strong style=\"font-size: 13px;\"> new watershed for the same location</strong><span style=\"font-size: 13px;\">. </span></p><p><span style=\"font-size: 13px;\">In the case of a small delineated watershed (see AREA - likely if AREA &lt; 121</span>km²<span style=\"font-size: 13px;\">), the precipitation quantile dataset of ~11km resolution may not contain a data point that falls directly within the delineated area. In this case, the app will estimate the value by interpolating between the nearest surrounding data points.</span></p>",
+        "placeholder": "<p><span>Eam laudem partem delectus ne, ipsum assentior id eam. Modus tamquam eam cu, nisl autem modus pri et.  </span></p>",
         "style": {
           "verticalAlign": "start",
           "wrap": true
@@ -1925,6 +1987,19 @@
       "label": "Watershed Explorer",
       "config": null,
       "id": "widget_42"
+    },
+    "widget_43": {
+      "uri": "widgets/common/text/",
+      "version": "1.21.0",
+      "label": "Text 20",
+      "config": {
+        "text": "<p><strong><em>see instructions for more</em></strong></p>",
+        "placeholder": "Double click to edit text",
+        "style": {
+          "wrap": true
+        }
+      },
+      "id": "widget_43"
     }
   },
   "widgetsManifest": {},
@@ -2158,16 +2233,9 @@
   },
   "messageConfigs": {},
   "attributes": {
-    "portalUrl": "https://unipd.maps.arcgis.com",
-    "isWebTier": false,
-    "clientId": "",
-    "express": false,
-    "title": "Watershed Explorer",
-    "description": "",
-    "type": "Web Experience",
-    "thumbnail": "thumbnail/thumbnail1785504952182.png"
+    "portalUrl": "https://unipd.maps.arcgis.com"
   },
-  "timestamp": 1785517513078,
+  "timestamp": 1786239748577,
   "sharedThemeVariables": {
     "header": {
       "bg": "#e60000"
@@ -2189,6 +2257,5 @@
     "height": {
       "LARGE": 75
     }
-  },
-  "publishTimestamp": 1786234444714
+  }
 }
